@@ -3,8 +3,11 @@
     <meta charset="utf8" />
     <title>All-you-can-drink</title>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="style.css">
-    <script src='js/fastclick.js' type="application/javascript"></script>
+    <link rel="stylesheet" href="css/reset.min.css">
+    <link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Signika+Negative:300,400,600,700'>
+    <link rel="stylesheet"href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script type="application/javascript" src="js/fastclick.js"></script>
     <script type="application/javascript">
         window.addEventListener('load', function() {
             FastClick.attach(document.body);
@@ -13,12 +16,19 @@
 </head>
 
 <body>
-<a class="block fastclick" href="#"></a>
-<a class="block fastclick" href="#"></a>
-<a class="block" href="#"></a>
-<a class="block" href="#"></a>
-<a class="block" href="#"></a>
-<a class="block" href="#"></a>
+<div class="stats">
+    <img src="img.jpg" class="img-circle" width="150px" height="150px" />
+    <div class="permil">0.15 &permil;</div>
+    <br />
+    <div class="info">Wieder nüchtern: 06:30 Uhr (<0,3&permil; &ndash; 03:15 Uhr)</div>
+    <div class="info">Zusätzlicher Wasserbedarf: 1,7 Liter</div>
+</div>
+<a class="block" href="#"><i class="fa fa-cog fa-2x"></i><br /> Einstellungen</a>
+<a class="block" href="#"><i class="fa fa-plus-circle fa-2x"></i><br /> Spieler hinzufügen</a>
+<a class="block" href="#"><i class="fa fa-users fa-2x"></i><br /> Multiplayer</a>
+<a class="block" href="#"><i class="fa fa-beer fa-2x"></i> +1<br /> Bier trinken</a>
+
+<div class="drink_responsibly"></div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.js"></script>
 <script src="js/app.js"></script>
