@@ -8,8 +8,8 @@ body {
     width: 50%;
     height: 33.333333%;
     float: left;
-    border: 5px solid #fff;
-    font-size: 3em;
+    border: 2px solid #fff;
+    font-size: 1.5em;
     text-align: center;
     padding-top: 30px;
 }
@@ -29,13 +29,7 @@ a:active {
     width: 100%;
     height: 33.333333%;
     color: #fff;
-    margin: 20px;
-}
-
-.stats img {
-    margin-right: 20px;
-    float: left;
-    border: 1px solid #000;
+    padding: 20px;
 }
 
 .stats .permil {
