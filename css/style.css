@@ -2,33 +2,43 @@ body {
     background-color: #222;
     font-family: 'Signika Negative', sans-serif;
     font-weight: 600;
+    padding-top: 50px;
 }
 .block {
-
-    width: 50%;
+    width: 30%;
     height: 100px;
-    display: block;
     border: 1px solid #666;
-    font-size: 1.5em;
+    font-size: 1.2em;
     text-align: center;
     padding-top: 10px;
-    margin-left: 25%;
+    margin-left: 10px;
+    float: left;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
 }
 
 .actionbar {
-    height: 63px;
+    top: 0;
+    height: 53px;
     background-color: #333;
     color: #fff;
-    padding: 7px;
-    font-size: 45px;
-    -webkit-box-shadow: 0px 1px 2px #000;
-    /* webkit browser*/
-    -moz-box-shadow: 0px 1px 2px #000;
-    /* firefox */
-    box-shadow: 0px 1px 2px #000;
+    padding: 12px;
+    font-size: 30px;
+    position: fixed;
+    width: 100%;
+    z-index: 10;
 }
 .actionbar i {
     padding-right: 10px;
+}
+
+.logo {
+    font-weight: 300;
+    background-image: url("../img/logo.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    padding-left: 30px;
 }
 
 a, a:hover {
@@ -44,9 +54,9 @@ a:active {
 
 .stats {
     width: 100%;
-    height: 33.333333%;
     color: #fff;
     padding: 20px;
+    display: block;
 }
 
 .stats .permil {
@@ -56,4 +66,20 @@ a:active {
 
 #chart {
     width: 100%;
+    height: 150px;
+}
+.drink_responsibly_popup {
+    position: fixed;
+    bottom: 0;
+    background-color: #fff;
+    color: #000;
+    width: 100%;
+    height: 35px;
+    padding: 10px;
+}
+.drink_responsibly_popup a {
+    color: #000;
+}
+.history {
+    color: #fff;
 }

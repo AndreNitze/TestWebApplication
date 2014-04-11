@@ -1,4 +1,4 @@
-angular.module('tutorialApp', [])
+angular.module('allucApp', [])
     .factory('History', function() {
         var items = [];
         return {
@@ -14,9 +14,11 @@ angular.module('tutorialApp', [])
 
        // $scope.history = History;
 
-        $http.get('https://mobile-quality-research.org/services/drinks/').then(function(historyResponse) {
-            $scope.drinks = historyResponse.data;
+        $http.get('https://mobile-quality-research.org/services/drinks/').then(function(drinksResponse) {
+            $scope.drinks = drinksResponse.data;
         });
+
+        $scope.history = History;
 
        // $scope.drinks = History;
 

@@ -1,11 +1,12 @@
-<html ng-app="tutorialApp">
+<html ng-app="allucApp">
 <head>
     <meta charset="utf8" />
     <title>All-you-can-drink</title>
+    <link rel="icon" type="image/png" href="img/logo.png" />
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/reset.min.css">
 
-    <link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Signika+Negative:300,400,600,700'>
+    <link rel='stylesheet' type='text/css' href='css/signika-negative.css'>
 
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="stylesheet" href="css/morris-0.4.3.min.css">
@@ -21,27 +22,40 @@
 
 <body>
 <div class="actionbar">
-    Alluc <!--<img src="img/logo.png" width="200px" height="49px" />-->
+    <span class="logo">Alluc</span> <!--<img src="img/logo.png" width="200px" height="49px" />-->
 
     <a href=""><i class="fa fa-cog pull-right" data-toggle="modal" data-target="#myModal"></i></a>
     <a href=""><i class="fa fa-users pull-right"></i></a>
 
 </div>
 <div class="stats">
-    <div class="permil">0.15 &permil;</div>
-    <br />
-    <div class="info">Wieder nüchtern: 06:30 Uhr (<0,3&permil; &ndash; 03:15 Uhr)</div>
-    <div class="info">Zusätzlicher Wasserbedarf: 1,7 Liter</div>
-    <div id="chart" style="height: 200px;"></div>
+    <div class="permil">0.65 &permil;</div>
+    <div class="info">Nüchtern in 8 Stunden (06:30 Uhr)</div>
+    <div class="info">Wasserbedarf: 1,7 Liter</div>
+    <div class="info">Energie: 1580 kcal</div>
+    <div id="chart"></div>
 </div>
 
-<br />
-<br />
-<br />
-<br />
-
 <!-- Matchmaking -->
-<a class="block" href="#"><i class="fa fa-users fa-2x"></i><br /> Kein Trinker online</a>
+<a class="block" href="#"><i class="fa fa-users fa-2x"></i><br /> 15 Trinker online</a>
+
+<!-- Add most used drink -->
+<a class="block" ng-click="history.addDrink('[\'Bier\',\'2014-04-11 15:52\']')" href="#"><i class="fa fa-beer fa-2x"></i> +1<br /> Bier trinken</a>
+
+<!-- Add new drink -->
+<a class="block" href="#"><i class="fa fa-plus-circle fa-2x"></i><br />Neues Getränk</a>
+
+<div class="history">
+    Trinkhistorie
+    <table class="table" ng-controller="HistoryCtrl">
+        <tr ng-repeat="drink in drinks">
+            <td>{{drink.time}}</td>
+            <td>{{drink.name}}</td>
+        </tr>
+    </table>
+</div>
+
+<div class="drink_responsibly_popup"><a href="#"><i class="fa fa-info-circle"></i> </a> Trink verantwortungsvoll!  <span class="pull-right"><a href="">&times;</a></span></div>
 
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -69,21 +83,11 @@
     </div>
 </div>
 
-<a class="block" ng-click="history.addDrink('Bier')" href="#"><i class="fa fa-beer fa-2x"></i> +1<br /> Bier trinken</a>
-
-Trinkhistorie
-<table class="table" ng-controller="HistoryCtrl">
-    <tr ng-repeat="drink in drinks">
-        <td>{{drink.time}}</td>
-        <td>{{drink.name}}</td>
-    </tr>
-</table>
-
-<!--<div class="drink_responsibly_popup">Verantwortungsvoll trinken. <a href="#">Mehr &raquo;</a></div>-->
-
+<!-- App logic -->
 <script src="js/angular.min.js"></script>
-
 <script src="js/app.js"></script>
+
+<!-- UI -->
 <script src="js/jquery-2.1.0.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 
@@ -112,9 +116,12 @@ Trinkhistorie
         // Labels for the ykeys -- will be displayed when you hover over the
         // chart.
         labels: ['Permil'],
+        postUnits: ['‰'],
         lineColors: ['#ffffff'],
-        xLabels: "15min"
+        xLabels: "15min",
+        grid: false
     });
 </script>
+
 </body>
 </html>
