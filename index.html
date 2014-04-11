@@ -2,11 +2,15 @@
 <head>
     <meta charset="utf8" />
     <title>All-you-can-drink</title>
-    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/reset.min.css">
+
     <link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Signika+Negative:300,400,600,700'>
-    <link rel="stylesheet"href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/morris-0.4.3.min.css">
     <link rel="stylesheet" href="css/style.css">
+
     <script type="application/javascript" src="js/fastclick.js"></script>
     <script type="application/javascript">
         window.addEventListener('load', function() {
@@ -16,20 +20,28 @@
 </head>
 
 <body>
+<div class="actionbar">
+    Alluc <!--<img src="img/logo.png" width="200px" height="49px" />-->
+
+    <a href=""><i class="fa fa-cog pull-right" data-toggle="modal" data-target="#myModal"></i></a>
+    <a href=""><i class="fa fa-users pull-right"></i></a>
+
+</div>
 <div class="stats">
     <div class="permil">0.15 &permil;</div>
     <br />
     <div class="info">Wieder nüchtern: 06:30 Uhr (<0,3&permil; &ndash; 03:15 Uhr)</div>
     <div class="info">Zusätzlicher Wasserbedarf: 1,7 Liter</div>
+    <div id="chart" style="height: 200px;"></div>
 </div>
-<a class="block" href="#" data-toggle="modal" data-target="#myModal"><i class="fa fa-cog fa-2x"></i><br /> Einstellungen</a>
-<a class="block" href="#"><i class="fa fa-plus-circle fa-2x"></i><br /> Spieler hinzufügen</a>
-<!--<a class="block" href="#"><i class="fa fa-users fa-2x"></i><br /> Multiplayer</a>-->
 
-<!-- Button trigger modal -->
-<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-    Launch demo modal
-</button>
+<br />
+<br />
+<br />
+<br />
+
+<!-- Matchmaking -->
+<a class="block" href="#"><i class="fa fa-users fa-2x"></i><br /> Kein Trinker online</a>
 
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -37,32 +49,71 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                <h4 class="modal-title" id="myModalLabel">Einstellungen</h4>
             </div>
             <div class="modal-body">
-                ...
+                Größe: <input type="number" min="120" value="170" max="220" /> cm<br />
+                Alter: <input type="number" min="18" value="20" max="80" /><br />
+                Gewicht: <input type="number" min="50" value="70" max="140" /> kg<br />
+                Geschlecht: <input type="radio" value="m" name="gender" checked /> männlich <input type="radio" value="f" name="gender" /> weiblich
+                <br /><br /><br />
+
+                <button type="button" class="btn btn-primary btn-lg btn-block">Matchmaking über Standort</button>
+                <input type="checkbox" name="gps_matchmaking" class="btn-lg" /> Matchmaking über Standort
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Schließen</button>
+                <button type="button" class="btn btn-primary">Speichern</button>
             </div>
         </div>
     </div>
 </div>
 
-<a class="block" href="#"><i class="fa fa-beer fa-2x"></i> +1<br /> Bier trinken</a>
+<a class="block" ng-click="history.addDrink('Bier')" href="#"><i class="fa fa-beer fa-2x"></i> +1<br /> Bier trinken</a>
+
+Trinkhistorie
+<table class="table" ng-controller="HistoryCtrl">
+    <tr ng-repeat="drink in drinks">
+        <td>{{drink.time}}</td>
+        <td>{{drink.name}}</td>
+    </tr>
+</table>
 
 <!--<div class="drink_responsibly_popup">Verantwortungsvoll trinken. <a href="#">Mehr &raquo;</a></div>-->
 
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.js"></script>
+<script src="js/angular.min.js"></script>
 
 <script src="js/app.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="js/jquery-2.1.0.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
 
+<!-- Charting -->
+<script src="js/raphael-min.js"></script>
+<script src="js/morris-0.4.3.min.js"></script>
 <script>
-    $(document).ready(function() {
-
+    new Morris.Line({
+        // ID of the element in which to draw the chart.
+        element: 'chart',
+        // Chart data records -- each entry in this array corresponds to a point on
+        // the chart.
+        data: [
+            { time: '2014-04-11 21:30', value: 0 },
+            { time: '2014-04-11 21:45', value: 0.27 },
+            { time: '2014-04-11 22:00', value: 0.44 },
+            { time: '2014-04-11 22:22', value: 0.53 },
+            { time: '2014-04-11 22:30', value: 0.82 },
+            { time: '2014-04-11 22:45', value: 0.65 }
+        ],
+        // The name of the data record attribute that contains x-values.
+        xkey: 'time',
+        // A list of names of data record attributes that contain y-values.
+        ykeys: ['value'],
+        hideHover: 'always',
+        // Labels for the ykeys -- will be displayed when you hover over the
+        // chart.
+        labels: ['Permil'],
+        lineColors: ['#ffffff'],
+        xLabels: "15min"
     });
 </script>
 </body>

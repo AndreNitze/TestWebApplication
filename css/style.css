@@ -4,14 +4,31 @@ body {
     font-weight: 600;
 }
 .block {
-    background-color: indigo;
+
     width: 50%;
-    height: 33.333333%;
-    float: left;
-    border: 2px solid #fff;
+    height: 100px;
+    display: block;
+    border: 1px solid #666;
     font-size: 1.5em;
     text-align: center;
-    padding-top: 30px;
+    padding-top: 10px;
+    margin-left: 25%;
+}
+
+.actionbar {
+    height: 63px;
+    background-color: #333;
+    color: #fff;
+    padding: 7px;
+    font-size: 45px;
+    -webkit-box-shadow: 0px 1px 2px #000;
+    /* webkit browser*/
+    -moz-box-shadow: 0px 1px 2px #000;
+    /* firefox */
+    box-shadow: 0px 1px 2px #000;
+}
+.actionbar i {
+    padding-right: 10px;
 }
 
 a, a:hover {
@@ -35,4 +52,8 @@ a:active {
 .stats .permil {
     font-size: 4em;
     font-weight: 200;
+}
+
+#chart {
+    width: 100%;
 }
