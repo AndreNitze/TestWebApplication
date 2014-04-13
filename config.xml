@@ -27,5 +27,7 @@
 	<gap:splash src="img/splash.png" />
 	
 	<preference name="orientation" value="portrait" />
+	
+	<preference name="permissions" value="none"/>
 
 </widget>
