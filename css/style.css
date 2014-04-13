@@ -57,10 +57,11 @@ a:active {
     color: #fff;
     padding: 20px;
     display: block;
+    text-align: center;
 }
 
 .stats .permil {
-    font-size: 4em;
+    font-size: 6em;
     font-weight: 200;
 }
 

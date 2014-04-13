@@ -31,8 +31,8 @@
 <div class="stats">
     <div class="permil">0.65 &permil;</div>
     <div class="info">Nüchtern in 8 Stunden (06:30 Uhr)</div>
-    <div class="info">Wasserbedarf: 1,7 Liter</div>
-    <div class="info">Energie: 1580 kcal</div>
+    <div class="info">H<small>2</small>O 1,7 Liter</div>
+    <div class="info">1580 kcal</div>
     <div id="chart"></div>
 </div>
 
@@ -40,19 +40,37 @@
 <a class="block" href="#"><i class="fa fa-users fa-2x"></i><br /> 15 Trinker online</a>
 
 <!-- Add most used drink -->
-<a class="block" ng-click="history.addDrink('[\'Bier\',\'2014-04-11 15:52\']')" href="#"><i class="fa fa-beer fa-2x"></i> +1<br /> Bier trinken</a>
+<table class="table" ng-controller="DrinksCtrl">
+    <tr ng-repeat="drink in drinks">
+        <td>{{drink.id}}</td>
+        <td>{{drink.name}}</td>
+        <td>{{drink.price}}</td>
+        <td><a href class="btn btn-default btn-sm" ng-click="history.addDrink(drink);">Hinzufügen</a></td>
+    </tr>
+</table>
+
+<a class="block" ng-click="history.addDrink(drink)" href="#"><i class="fa fa-beer fa-2x"></i> +1<br /> Bier trinken</a>
 
 <!-- Add new drink -->
 <a class="block" href="#"><i class="fa fa-plus-circle fa-2x"></i><br />Neues Getränk</a>
 
 <div class="history">
-    Trinkhistorie
-    <table class="table" ng-controller="HistoryCtrl">
-        <tr ng-repeat="drink in drinks">
-            <td>{{drink.time}}</td>
-            <td>{{drink.name}}</td>
-        </tr>
-    </table>
+    <div ng-controller="HistoryCtrl">
+        <div ng-hide="history.getItems().length" class="alert alert-info">Noch nichts getrunken.</div>
+        <table ng-show="history.getItems().length" class="table">
+            <tr ng-repeat="item in history.getItems() track by $index">
+                <td>{{item.name}}</td>
+                <td>{{item.price }}</td>
+            </tr>
+            <!--
+            <tr>
+              <td>{{history.items.length}} Artikel</td>
+              <td>{{history.sum() | currency}}</td>
+              <td></td>
+            </tr>
+            -->
+        </table>
+    </div>
 </div>
 
 <div class="drink_responsibly_popup"><a href="#"><i class="fa fa-info-circle"></i> </a> Trink verantwortungsvoll!  <span class="pull-right"><a href="">&times;</a></span></div>

@@ -5,26 +5,26 @@ angular.module('allucApp', [])
             getItems: function() {
                 return items;
             },
-            addDrink: function(drink) {
+            addArticle: function(drink) {
                 items.push(drink);
+            },
+            sum: function() {
+                return items.reduce(function(total, drink) {
+                    return total + drink.price;
+                }, 0);
             }
         };
     })
-    .controller('HistoryCtrl', function($scope, $http, History){
-
-       // $scope.history = History;
-
-        $http.get('https://mobile-quality-research.org/services/drinks/').then(function(drinksResponse) {
-            $scope.drinks = drinksResponse.data;
-        });
-
+    .controller('DrinksCtrl', function($scope, $http, History){
         $scope.history = History;
 
-       // $scope.drinks = History;
-
-        /*
-        $http.get('https://www.mobile-quality-research.org/services/meals').success(function(data) {
-            $scope.meals = data;
-        });
-        */
+        $scope.drinks = [
+            {"id": "1", "name": "Bier", "price": 5 },
+            {"id": "2", "name": "Wein",    "price": 5.5 },
+            {"id": "3", "name": "Schnaps", "price": 6 },
+            {"id": "4", "name": "Alkopop", "price": 0 }
+        ];
+    })
+    .controller('HistoryCtrl', function($scope, History){
+        $scope.history = History;
     });

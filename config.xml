@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <widget xmlns   = "http://www.w3.org/ns/widgets"
+        xmlns:gap   = "http://phonegap.com/ns/1.0"
+		xmlns:android   = "http://schemas.android.com/apk/res/android"
+        id          = "org.mobile-quality-research.www"
+        versionCode = "1" 
+        version     = "0.1" >
+
+    <!-- versionCode is optional and Android only -->
+
+    <name>All-U-Can-Drink</name>
+
+    <description>
+        All-U-Can-Drink lets you track your alcohol intake and calculates your blood alcohol level.
+    </description>
+	
+	<icon src="img/logo.png" />
+
+    <author href="https://www.mobile-quality-research.org" email="kontakt@mobile-quality-research.org">
+       André Nitze
+    </author>
+	
+	<gap:platform name="ios" />
+	<gap:platform name="android" />
+	<gap:platform name="winphone" />
+	
+	<gap:splash src="img/splash.png" />
+	
+	<preference name="orientation" value="portrait" />
+
+</widget>
