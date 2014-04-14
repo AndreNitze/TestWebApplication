@@ -1,14 +1,24 @@
-angular.module('allucApp', [])
+angular.module('drinksApp', [])
     .factory('History', function() {
         var items = [];
         return {
             getItems: function() {
                 return items;
             },
-            addArticle: function(drink) {
+            addDrink: function(drink) {
                 items.push(drink);
             },
             sum: function() {
+                return items.reduce(function(total, drink) {
+                    return total + drink.price;
+                }, 0);
+            }
+        };
+    })
+    .factory('???', function() {
+        var permil = 0.0;
+        return {
+            calculatePermille: function() {
                 return items.reduce(function(total, drink) {
                     return total + drink.price;
                 }, 0);

@@ -8,16 +8,16 @@
 
     <!-- versionCode is optional and Android only -->
 
-    <name>All-U-Can-Drink</name>
+    <name>Drinks</name>
 
     <description>
-        All-U-Can-Drink lets you track your alcohol intake and calculates your blood alcohol level.
+        "Drinks" lets you track your alcohol intake and calculates your blood alcohol level.
     </description>
 	
 	<icon src="img/logo.png" />
 
     <author href="https://www.mobile-quality-research.org" email="kontakt@mobile-quality-research.org">
-       André Nitze
+       Andr&eacute; Nitze
     </author>
 	
 	<gap:platform name="ios" />

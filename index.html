@@ -1,12 +1,13 @@
-<html ng-app="allucApp">
+<html ng-app="drinksApp">
 <head>
     <meta charset="utf8" />
-    <title>All-you-can-drink</title>
+    <title>Drinks</title>
     <link rel="icon" type="image/png" href="img/logo.png" />
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/reset.min.css">
 
-    <link rel='stylesheet' type='text/css' href='css/signika-negative.css'>
+   <!-- <link rel='stylesheet' type='text/css' href='css/signika-negative.css'>-->
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,900,300,100' rel='stylesheet' type='text/css'>
 
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="stylesheet" href="css/morris-0.4.3.min.css">
@@ -22,24 +23,36 @@
 
 <body>
 <div class="actionbar">
-    <span class="logo">Alluc</span> <!--<img src="img/logo.png" width="200px" height="49px" />-->
+    <span class="logo">Drinks</span> <!--<img src="img/logo.png" width="200px" height="49px" />-->
 
+    <!--
     <a href=""><i class="fa fa-cog pull-right" data-toggle="modal" data-target="#myModal"></i></a>
     <a href=""><i class="fa fa-users pull-right"></i></a>
-
+    -->
 </div>
 <div class="stats">
-    <div class="permil">0.65 &permil;</div>
+    <div class="permil">0.65<small>&permil;</small></div>
+    <!--
     <div class="info">Nüchtern in 8 Stunden (06:30 Uhr)</div>
     <div class="info">H<small>2</small>O 1,7 Liter</div>
     <div class="info">1580 kcal</div>
     <div id="chart"></div>
+    -->
+    <br /><br />
+    <div class="container">
+        <div class="col-xs-offset-2 col-xs-1">
+            <a class="alluc-button" ng-click="history.addDrink(drink)" href=""><i class="fa fa-beer fa-3x"></i>&nbsp;&nbsp;<br />Bier trinken</a>
+        </div>
+    </div>
 </div>
 
 <!-- Matchmaking -->
+<!--
 <a class="block" href="#"><i class="fa fa-users fa-2x"></i><br /> 15 Trinker online</a>
+-->
 
 <!-- Add most used drink -->
+<!--
 <table class="table" ng-controller="DrinksCtrl">
     <tr ng-repeat="drink in drinks">
         <td>{{drink.id}}</td>
@@ -48,12 +61,16 @@
         <td><a href class="btn btn-default btn-sm" ng-click="history.addDrink(drink);">Hinzufügen</a></td>
     </tr>
 </table>
+-->
 
-<a class="block" ng-click="history.addDrink(drink)" href="#"><i class="fa fa-beer fa-2x"></i> +1<br /> Bier trinken</a>
+<!-- Add beer -->
+
 
 <!-- Add new drink -->
+<!--
 <a class="block" href="#"><i class="fa fa-plus-circle fa-2x"></i><br />Neues Getränk</a>
-
+-->
+<!--
 <div class="history">
     <div ng-controller="HistoryCtrl">
         <div ng-hide="history.getItems().length" class="alert alert-info">Noch nichts getrunken.</div>
@@ -62,18 +79,13 @@
                 <td>{{item.name}}</td>
                 <td>{{item.price }}</td>
             </tr>
-            <!--
-            <tr>
-              <td>{{history.items.length}} Artikel</td>
-              <td>{{history.sum() | currency}}</td>
-              <td></td>
-            </tr>
-            -->
         </table>
     </div>
 </div>
-
+-->
+<!--
 <div class="drink_responsibly_popup"><a href="#"><i class="fa fa-info-circle"></i> </a> Trink verantwortungsvoll!  <span class="pull-right"><a href="">&times;</a></span></div>
+-->
 
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -112,6 +124,7 @@
 <!-- Charting -->
 <script src="js/raphael-min.js"></script>
 <script src="js/morris-0.4.3.min.js"></script>
+<!--
 <script>
     new Morris.Line({
         // ID of the element in which to draw the chart.
@@ -140,6 +153,6 @@
         grid: false
     });
 </script>
-
+-->
 </body>
 </html>
