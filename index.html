@@ -30,21 +30,279 @@
     <a href=""><i class="fa fa-users pull-right"></i></a>
     -->
 </div>
-<div class="stats">
-    <div class="permil">0.65<small>&permil;</small></div>
+
+<div class="stats" ng-controller="AlcoholCtrl as alc">
+    <span id="permile" class="permille">{{ bac | number : 2 }}</span><span class="permille"><small>&permil;</small></span>
     <!--
-    <div class="info">Nüchtern in 8 Stunden (06:30 Uhr)</div>
+    <div class="info">Nuechtern in 8 Stunden (06:30 Uhr)</div>
     <div class="info">H<small>2</small>O 1,7 Liter</div>
     <div class="info">1580 kcal</div>
     <div id="chart"></div>
     -->
     <br /><br />
-    <div class="container">
-        <div class="col-xs-offset-2 col-xs-1">
-            <a class="alluc-button" ng-click="history.addDrink(drink)" href=""><i class="fa fa-beer fa-3x"></i>&nbsp;&nbsp;<br />Bier trinken</a>
-        </div>
+    <div class="col-xs-offset-2 col-xs-1" ng-repeat="drink in menu">
+        <a class="alluc-button" ng-click="history.addDrink()" href=""><i class="fa fa-beer fa-3x"></i>&nbsp;&nbsp;<br />{{ drink.name }}</a>
     </div>
+
+    <ul>
+        <li ng-repeat="record in history.getDrinks() track by $index">{{record.time | date : 'HH:mm' }} {{ record.drink.name }}</li>
+    </ul>
 </div>
+
+<!-- App logic -->
+<script src="js/angular.min.js"></script>
+<script src="js/angular-animate.min.js"></script>
+<script src="js/angular-route.min.js"></script>
+
+<script>
+    var drinksApp = angular.module('drinksApp', ['ngRoute', 'ngAnimate']);
+
+    drinksApp.factory('History', function() {
+        var records = [];
+        var drink = {};
+        var timestamp = 0;
+
+        return {
+            getDrinks: function() {
+                return records;
+            },
+            addDrink: function() {
+
+                 // Get drink properties (dummy)
+                drink = {'id':'0', 'name':'Bier','permille': 0.05, 'liquid': 500, 'duration': 30};
+
+                // Get drinking time
+                timestamp = new Date().getTime();
+
+                // Push drink and drinking time to array
+                records.push({'drink': drink, 'time': timestamp});
+            }
+        };
+    });
+
+    drinksApp.controller('AlcoholCtrl', function($scope, $interval, $window, History, $log) {
+        // Array to hold timestamps and BAC values [{'17:50','0.13'},{'17:51','0.14'}, ...]
+        $scope.bac_data = [];
+
+        // Current blood alcohol concentration (g alc/kg blood)
+        $scope.bac = 0.0;
+
+        $scope.max_bac = 0;
+
+        // Drinks menu
+        $scope.menu = [ {'id':'0', 'name':'Beer','permille': 0.05, 'liquid': 500, 'duration': 30},
+                        {'id':'1', 'name':'Shot','permille': 0.45, 'liquid': 40, 'duration': 1}
+                        ];
+
+        // History service
+        $scope.history = History;
+
+        // Regularly update BAC display
+        $interval(function() {
+            if ($scope.history.getDrinks().length > 0)
+                calculateBAC();
+        }, 2000);
+
+        function calculateBAC() {
+            /* Calculation vars */
+            // Alcohol mass (g)
+            var alcohol = 0;
+
+            // Person's details
+            var age = 25;
+            var height = 170;
+            var weight = 70;
+
+            // Total body water
+            var total_body_water = 2.447 - 0.09516 * age + 0.1074 * height + 0.3362 * weight;
+
+            // Calculate BAC every minute (1 min = 60 s = 60000 ms)
+            var interval = 60;
+
+            // Formatted time: "15:30"
+            var time_label = "";
+
+            // Alcohol stack for storing alcohol for every interval
+            var alc_stack = [];
+
+            // Interval distribution vars
+            var parts_count = 0;
+            var parts_size = 0;
+            var next_interval = "";
+            var next_interval_timestamp = 0;
+
+            // Alcohol depletion vars
+            var decrement = 0;
+            var new_bac = 0;
+
+            // Get drinks records from "History" service
+            var records = $scope.history.getDrinks();
+
+            // ATTENTION: ROUNDING ERRORS?
+            // Now (s)
+            var now_timestamp = new Date().getTime();
+
+            // Initialize interval timestamp with time of first drink (s)
+            var current_interval_timestamp = records[0].time;
+
+            //
+            // 1) Distribute alcohol of all drinks proportionally to intervals depending on drinking duration
+            //
+
+            // For every interval step between "first drink" and "now"...
+            while (current_interval_timestamp <= now_timestamp) {
+
+                // Formatted time: "15:30"
+                time_label = new Date(current_interval_timestamp).getHours()+":"+new Date(current_interval_timestamp).getMinutes();
+
+                // Initialize alcohol amount
+                alcohol = 0;
+
+                // Fetch existing alcohol from stack
+                if (alc_stack[time_label] != undefined) {
+                    alcohol = alcohol + alc_stack[time_label];
+                    alc_stack.splice(time_label);
+                }
+
+                // "for (key in array)" works for "most cases"
+                // TODO Find a more compatible solution for "foreach"-loop
+
+                // For every drink...
+                for (key in records) {
+                    // If drink was consumed in current interval (i)...
+                    // TODO analysieren was hier passiert: intervallgrenzen korrekt?
+                    if (records[key].time >= current_interval_timestamp - interval * 1000 / 2 && records[key].time <= current_interval_timestamp + interval * 1000 / 2) {
+
+                        /*
+                        $log.log(new Date(records[key].time).getHours()+":"+
+                                new Date(records[key].time).getMinutes()+"."+
+                                new Date(records[key].time).getSeconds()+" liegt zwischen "+
+                                new Date(current_interval_timestamp - interval * 1000 / 2).getHours()+":"+
+                                new Date(current_interval_timestamp - interval * 1000/ 2).getMinutes()+"."+
+                                new Date(current_interval_timestamp - interval * 1000/ 2).getSeconds()+" und "+
+                                new Date(current_interval_timestamp + interval * 1000/ 2).getHours()+":"+
+                                new Date(current_interval_timestamp + interval * 1000/ 2).getMinutes()+"."+
+                                new Date(current_interval_timestamp + interval * 1000/ 2).getSeconds());
+                        */
+
+                        // Calculate alcohol mass of drink
+
+                        // Alcohol mass (g) = Volume of drink (ml) * alc volume percentage (e.g. 0,05) * density of alcohol (0,8 g/ml)
+                        alcohol = alcohol + (records[key].drink.liquid * (records[key].drink.permille / 100) * 0.8);
+
+                        // If drinking time (min) > interval (min) distribute alcohol evenly
+                        if (records[key].drink.duration > interval / 60) {
+
+                            // Calculate parts
+                            parts_count = Math.ceil(records[key].drink.duration/(interval/60));
+
+                            // Calculate size of each part
+                            parts_size = alcohol/parts_count;
+
+                            // Distribute parts to later intervals
+                            for (var j = 0; j <= parts_count; j++) {
+                                next_interval_timestamp = j * interval * 1000 + current_interval_timestamp;
+
+                                next_interval = pad(new Date(next_interval_timestamp).getHours())+":"+
+                                                pad(new Date(next_interval_timestamp).getMinutes());
+
+                                if (!isNaN(alc_stack[next_interval])) {
+                                    alc_stack[next_interval] = alc_stack[next_interval] + parts_size;
+                                } else {
+                                    alc_stack[next_interval] = parts_size;
+                                }
+                            }
+                            // Assign first part for further calculation
+                            // TODO Was passiert mit dem Rest aus dem Alkohol-Stack???
+                            alcohol = parts_size;
+                        }
+                    }
+                }
+
+                //
+                // 2) Calculate blood alcohol concentration (BAC)
+                //
+
+                // Watson
+                if (alcohol > 0) {
+                    if ($scope.bac > 0) {
+                        $scope.bac = $scope.bac + ((0.8 * alcohol)/(1.055 * total_body_water)) * 0.8;
+                    } else {
+                        $scope.bac = ((0.8 * alcohol)/(1.055 * total_body_water)) * 0.8;
+                    }
+                }
+
+                /*
+                 * Resorptionszeiten
+                 * Schnaps (um 40 Vol%) ca. 10 %
+                 * Wein/Sekt (um 10 Vol%) ca. 20 %
+                 * Bier (um 5 Vol%) ca. 30 %
+                 */
+
+                // Alcohol depletion
+                // 0,15 g/kg = 0,15 permille per hour
+                decrement = 0.15/(3600/interval*1000);
+                new_bac = $scope.bac - decrement;
+
+                if (new_bac < 0) {
+                    $scope.bac = 0;
+                } else {
+                    $scope.bac = new_bac;
+                }
+
+                // Save data pairs (time_label, bac) in array
+                $scope.bac_data[time_label] = $scope.bac;
+
+                // Update maximum BAC, if necessary
+                if ($scope.bac > $scope.max_bac) {
+                    $scope.max_bac = $scope.bac;
+                }
+
+                // Increment counter with interval (milliseconds)
+                current_interval_timestamp = current_interval_timestamp + interval * 1000;
+            }
+        }
+
+        function pad(value) {
+            if(value < 10) {
+                return '0' + value;
+            } else {
+                return value;
+            }
+        }
+    });
+</script>
+<!--<script src="js/app.js"></script>-->
+
+<!-- UI -->
+<script src="js/jquery-2.1.0.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+<p>History</p>
+<div ng-controller="HistoryCtrl">
+    <ul>
+        <li ng-repeat="drink in drinks">
+            {{drink.name}}
+        </li>
+    </ul>
+</div>
+-->
 
 <!-- Matchmaking -->
 <!--
@@ -62,10 +320,6 @@
     </tr>
 </table>
 -->
-
-<!-- Add beer -->
-
-
 <!-- Add new drink -->
 <!--
 <a class="block" href="#"><i class="fa fa-plus-circle fa-2x"></i><br />Neues Getränk</a>
@@ -83,47 +337,17 @@
     </div>
 </div>
 -->
+
 <!--
 <div class="drink_responsibly_popup"><a href="#"><i class="fa fa-info-circle"></i> </a> Trink verantwortungsvoll!  <span class="pull-right"><a href="">&times;</a></span></div>
 -->
 
-<!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">Einstellungen</h4>
-            </div>
-            <div class="modal-body">
-                Größe: <input type="number" min="120" value="170" max="220" /> cm<br />
-                Alter: <input type="number" min="18" value="20" max="80" /><br />
-                Gewicht: <input type="number" min="50" value="70" max="140" /> kg<br />
-                Geschlecht: <input type="radio" value="m" name="gender" checked /> männlich <input type="radio" value="f" name="gender" /> weiblich
-                <br /><br /><br />
-
-                <button type="button" class="btn btn-primary btn-lg btn-block">Matchmaking über Standort</button>
-                <input type="checkbox" name="gps_matchmaking" class="btn-lg" /> Matchmaking über Standort
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Schließen</button>
-                <button type="button" class="btn btn-primary">Speichern</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- App logic -->
-<script src="js/angular.min.js"></script>
-<script src="js/app.js"></script>
-
-<!-- UI -->
-<script src="js/jquery-2.1.0.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-
 <!-- Charting -->
+<!--
 <script src="js/raphael-min.js"></script>
 <script src="js/morris-0.4.3.min.js"></script>
+-->
+
 <!--
 <script>
     new Morris.Line({

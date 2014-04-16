@@ -1,31 +1,25 @@
-angular.module('drinksApp', [])
-    .factory('History', function() {
+    'use strict';
+    var app = angular.module('drinksApp', ['ngRoute', 'ngAnimate']);
+/*
+    app.factory('Drinker', function() {
         var items = [];
+        var bac = 0.04;
+
         return {
-            getItems: function() {
+            getDrinks: function() {
                 return items;
             },
             addDrink: function(drink) {
                 items.push(drink);
             },
-            sum: function() {
-                return items.reduce(function(total, drink) {
-                    return total + drink.price;
-                }, 0);
+            getBAC: function() {
+                return 0.05;
             }
         };
-    })
-    .factory('???', function() {
-        var permil = 0.0;
-        return {
-            calculatePermille: function() {
-                return items.reduce(function(total, drink) {
-                    return total + drink.price;
-                }, 0);
-            }
-        };
-    })
-    .controller('DrinksCtrl', function($scope, $http, History){
+    });
+*/
+    /*
+    app.controller('DrinksCtrl', function($scope, $http, History){
         $scope.history = History;
 
         $scope.drinks = [
@@ -34,7 +28,30 @@ angular.module('drinksApp', [])
             {"id": "3", "name": "Schnaps", "price": 6 },
             {"id": "4", "name": "Alkopop", "price": 0 }
         ];
-    })
-    .controller('HistoryCtrl', function($scope, History){
+    });
+    app.controller('HistoryCtrl', function($scope, History){
         $scope.history = History;
     });
+    */
+
+    app.controller('AlcoholCtrl', function($scope) {
+        $scope.bac = 0.99;
+
+        function greet() {
+            alert("test");
+        }
+    });
+    /*
+    app.config(function($routeProvider) {
+        $routeProvider.when('/',
+        {
+            controller: 'HomeCtrl',
+            templateUrl: 'views/home.html'
+        })
+        .when('/settings',
+        {
+            controller: 'SettingsCtrl',
+            templateUrl: 'views/settings.html'
+        })
+    });
+    */
