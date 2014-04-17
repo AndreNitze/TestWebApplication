@@ -31,20 +31,30 @@
 </div>
 
 <div class="stats">
+    <div class="permille">
+        <span >{{ bac | number : 2 }}</span><span><small>&permil;</small></span>
+        <br />
+        <span class="small">Current blood alcohol concentration</span>
+    </div>
 
-    <span id="permile" class="permille">{{ bac | number : 2 }}</span><span class="permille"><small>&permil;</small></span>
+    <div class="permille" style="display: none">
+        <span >{{ time_to_sober }}</span><span><small>h</small></span>
+        <br />
+        <span class="small">Time to sober</span>
+    </div>
+    <br /><br />
     <!--
     <div class="info">Nuechtern in 8 Stunden (06:30 Uhr)</div>
     <div class="info">H<small>2</small>O 1,7 Liter</div>
     <div class="info">1580 kcal</div>
     <div id="chart"></div>
-    --><br />
-    Current blood alcohol concentration<br /><br />
+    -->
     <!--Maximum: 0.44 &permil;<br />
     Sober: <br />-->
 </div>
+
 <div class="buttons">
-    <a class="alluc-button" ng-click="history.addDrink(drink)" ng-repeat="drink in menu">{{ drink.name }}</a>
+    <a class="alluc-button" ng-click="history.addDrink(drink)" ng-repeat="drink in menu" href="#">{{ drink.name }}</a>
 </div>
 
 <ul class="stats">
@@ -94,7 +104,7 @@
 
         // Drinks menu
         $scope.menu = [ {'id':'0', 'name':'Beer','permille': 5, 'liquid': 500, 'duration': 30},
-                        {'id':'1', 'name':'Spirit','permille': 0.45, 'liquid': 40, 'duration': 1},
+                        {'id':'1', 'name':'Spirit','permille': 0.45, 'liquid': 40, 'duration': 2},
                         {'id':'3', 'name':'Cocktail','permille': 15, 'liquid': 300, 'duration': 20},
                         {'id':'4', 'name':'Wine','permille': 10, 'liquid': 200, 'duration': 30}
                         ];
@@ -104,6 +114,8 @@
 
         // Define calculation interval in milliseconds
         $scope.interval = 60000;
+
+        $scope.time_to_sober = 0;
 
         // Regularly update BAC display
         $interval(function() {
@@ -347,6 +359,9 @@
             $log.log("bac_data:");
             $log.log(bac_data);
 
+            // Update time to sober
+            $scope.time_to_sober = current_interval_label;
+
             return bac_data;
         }
 
@@ -364,6 +379,14 @@
 <!-- UI -->
 <script src="js/jquery-2.1.0.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
+
+<script>
+    $(".stats").click(function() {
+        $( ".permille" ).toggle( 80, function() {
+            // Animation complete.
+        });
+    });
+</script>
 
 
 <!-- Matchmaking -->

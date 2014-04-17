@@ -1,5 +1,5 @@
 body {
-    background-color: #E70F0F;;
+    background-color: #555555;
     font-family: 'Roboto', sans-serif;
     font-weight: 600;
     padding-top: 50px;
@@ -42,6 +42,7 @@ small {
     position: fixed;
     width: 100%;
     z-index: 10;
+    background-image: url("../img/actionbar_bg.png");
 }
 .actionbar i {
     padding-right: 10px;
@@ -77,6 +78,10 @@ a:active {
 .stats .permille {
     font-size: 6em;
     font-weight: 200;
+}
+
+.small {
+    font-size: 0.15em;
 }
 
 #chart {
