@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="css/reset.min.css">
 
    <!-- <link rel='stylesheet' type='text/css' href='css/signika-negative.css'>-->
-    <link href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,900,300,100' rel='stylesheet' type='text/css'>
-
+    <!--<link href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,900,300,100' rel='stylesheet' type='text/css'>
+-->
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="stylesheet" href="css/morris-0.4.3.min.css">
     <link rel="stylesheet" href="css/style.css">
@@ -21,33 +21,35 @@
     </script>
 </head>
 
-<body>
+<body ng-controller="AlcoholCtrl as alc">
 <div class="actionbar">
     <span class="logo">Drinks</span> <!--<img src="img/logo.png" width="200px" height="49px" />-->
-
     <!--
     <a href=""><i class="fa fa-cog pull-right" data-toggle="modal" data-target="#myModal"></i></a>
     <a href=""><i class="fa fa-users pull-right"></i></a>
     -->
 </div>
 
-<div class="stats" ng-controller="AlcoholCtrl as alc">
+<div class="stats">
+
     <span id="permile" class="permille">{{ bac | number : 2 }}</span><span class="permille"><small>&permil;</small></span>
     <!--
     <div class="info">Nuechtern in 8 Stunden (06:30 Uhr)</div>
     <div class="info">H<small>2</small>O 1,7 Liter</div>
     <div class="info">1580 kcal</div>
     <div id="chart"></div>
-    -->
-    <br /><br />
-    <div class="col-xs-offset-2 col-xs-1" ng-repeat="drink in menu">
-        <a class="alluc-button" ng-click="history.addDrink()" href=""><i class="fa fa-beer fa-3x"></i>&nbsp;&nbsp;<br />{{ drink.name }}</a>
-    </div>
-
-    <ul>
-        <li ng-repeat="record in history.getDrinks() track by $index">{{record.time | date : 'HH:mm' }} {{ record.drink.name }}</li>
-    </ul>
+    --><br />
+    Current blood alcohol concentration<br /><br />
+    <!--Maximum: 0.44 &permil;<br />
+    Sober: <br />-->
 </div>
+<div class="buttons">
+    <a class="alluc-button" ng-click="history.addDrink(drink)" ng-repeat="drink in menu">{{ drink.name }}</a>
+</div>
+
+<ul class="stats">
+    <li ng-repeat="record in history.getDrinks() track by $index">{{record.time | date : 'HH:mm' }} {{ record.drink.name }}</li>
+</ul>
 
 <!-- App logic -->
 <script src="js/angular.min.js"></script>
@@ -59,17 +61,16 @@
 
     drinksApp.factory('History', function() {
         var records = [];
-        var drink = {};
         var timestamp = 0;
 
         return {
             getDrinks: function() {
                 return records;
             },
-            addDrink: function() {
+            addDrink: function(drink) {
 
                  // Get drink properties (dummy)
-                drink = {'id':'0', 'name':'Bier','permille': 0.05, 'liquid': 500, 'duration': 30};
+                //drink = {'id':'0', 'name':'Bier','permille': 0.05, 'liquid': 500, 'duration': 30};
 
                 // Get drinking time
                 timestamp = new Date().getTime();
@@ -85,60 +86,79 @@
         $scope.bac_data = [];
 
         // Current blood alcohol concentration (g alc/kg blood)
-        $scope.bac = 0.0;
+        $scope.bac = 0;
+
+        var now_label = "";
 
         $scope.max_bac = 0;
 
         // Drinks menu
-        $scope.menu = [ {'id':'0', 'name':'Beer','permille': 0.05, 'liquid': 500, 'duration': 30},
-                        {'id':'1', 'name':'Shot','permille': 0.45, 'liquid': 40, 'duration': 1}
+        $scope.menu = [ {'id':'0', 'name':'Beer','permille': 5, 'liquid': 500, 'duration': 30},
+                        {'id':'1', 'name':'Spirit','permille': 0.45, 'liquid': 40, 'duration': 1},
+                        {'id':'3', 'name':'Cocktail','permille': 15, 'liquid': 300, 'duration': 20},
+                        {'id':'4', 'name':'Wine','permille': 10, 'liquid': 200, 'duration': 30}
                         ];
 
         // History service
         $scope.history = History;
 
+        // Define calculation interval in milliseconds
+        $scope.interval = 60000;
+
         // Regularly update BAC display
         $interval(function() {
-            if ($scope.history.getDrinks().length > 0)
-                calculateBAC();
-        }, 2000);
+            if ($scope.history.getDrinks().length > 0) {
+                $scope.bac_data = getBACData();
 
-        function calculateBAC() {
+                now_label = pad(new Date().getHours())+":"+pad(new Date().getMinutes());
+                $scope.bac = $scope.bac_data[now_label];
+            }
+        }, $scope.interval);
+
+        function getBACData() {
+            // TODO Replace associative arrays with numeric ones for performance and easier iterating
+
+            // TODO Add resorption delay (until drink reaches digestion tract)
+
             /* Calculation vars */
             // Alcohol mass (g)
             var alcohol = 0;
 
             // Person's details
-            var age = 25;
+            var age = 27;
             var height = 170;
-            var weight = 70;
+            var weight = 68;
 
             // Total body water
             var total_body_water = 2.447 - 0.09516 * age + 0.1074 * height + 0.3362 * weight;
 
-            // Calculate BAC every minute (1 min = 60 s = 60000 ms)
-            var interval = 60;
+            // Calculation interval in milliseconds (1 min = 60 s = 60000 ms)
+            var interval = $scope.interval;
 
             // Formatted time: "15:30"
-            var time_label = "";
+            var current_interval_label = "";
 
-            // Alcohol stack for storing alcohol for every interval
-            var alc_stack = [];
+            // Alcohol stack for storing alcohol mass for every interval
+            var alc_data = [];
+
+            // BAC stack for storing permille values for every interval
+            var bac_data = [];
 
             // Interval distribution vars
             var parts_count = 0;
             var parts_size = 0;
-            var next_interval = "";
+            var next_interval_label = "";
             var next_interval_timestamp = 0;
 
             // Alcohol depletion vars
-            var decrement = 0;
-            var new_bac = 0;
+            // 0,15 g/kg = 0,15 permille per hour --> Interval: 1 minute => 0,0025 permille / minute depletion
+            var bac_depletion = 0.15/(3600/(interval/1000));
+            var last_bac = 0;
+            var VALID_BAC_EXISTS = false;
 
             // Get drinks records from "History" service
             var records = $scope.history.getDrinks();
 
-            // ATTENTION: ROUNDING ERRORS?
             // Now (s)
             var now_timestamp = new Date().getTime();
 
@@ -152,16 +172,19 @@
             // For every interval step between "first drink" and "now"...
             while (current_interval_timestamp <= now_timestamp) {
 
-                // Formatted time: "15:30"
-                time_label = new Date(current_interval_timestamp).getHours()+":"+new Date(current_interval_timestamp).getMinutes();
+                // Formatted time: "15:30" for current interval
+                current_interval_label = pad(new Date(current_interval_timestamp).getHours())+":"+
+                             pad(new Date(current_interval_timestamp).getMinutes());
 
-                // Initialize alcohol amount
-                alcohol = 0;
+                // Fetch existing alcohol mass from stack
+                if (alc_data[current_interval_label] != undefined) {
 
-                // Fetch existing alcohol from stack
-                if (alc_stack[time_label] != undefined) {
-                    alcohol = alcohol + alc_stack[time_label];
-                    alc_stack.splice(time_label);
+                    //$log.log("Auf Intervall "+current_interval_label+" liegen "+alc_data[current_interval_label]+" g Alkohol");
+
+                    alcohol = alc_data[current_interval_label];
+                } else {
+                    // Initialize alcohol mass for every interval
+                    alcohol = 0;
                 }
 
                 // "for (key in array)" works for "most cases"
@@ -169,98 +192,162 @@
 
                 // For every drink...
                 for (key in records) {
-                    // If drink was consumed in current interval (i)...
-                    // TODO analysieren was hier passiert: intervallgrenzen korrekt?
-                    if (records[key].time >= current_interval_timestamp - interval * 1000 / 2 && records[key].time <= current_interval_timestamp + interval * 1000 / 2) {
-
-                        /*
-                        $log.log(new Date(records[key].time).getHours()+":"+
-                                new Date(records[key].time).getMinutes()+"."+
-                                new Date(records[key].time).getSeconds()+" liegt zwischen "+
-                                new Date(current_interval_timestamp - interval * 1000 / 2).getHours()+":"+
-                                new Date(current_interval_timestamp - interval * 1000/ 2).getMinutes()+"."+
-                                new Date(current_interval_timestamp - interval * 1000/ 2).getSeconds()+" und "+
-                                new Date(current_interval_timestamp + interval * 1000/ 2).getHours()+":"+
-                                new Date(current_interval_timestamp + interval * 1000/ 2).getMinutes()+"."+
-                                new Date(current_interval_timestamp + interval * 1000/ 2).getSeconds());
-                        */
+                    // If drink was consumed in current interval...
+                    if (records[key].time >= current_interval_timestamp - interval / 2 &&
+                        records[key].time <= current_interval_timestamp + interval / 2) {
 
                         // Calculate alcohol mass of drink
 
                         // Alcohol mass (g) = Volume of drink (ml) * alc volume percentage (e.g. 0,05) * density of alcohol (0,8 g/ml)
                         alcohol = alcohol + (records[key].drink.liquid * (records[key].drink.permille / 100) * 0.8);
 
+                        //$log.log("Alkohol-Masse für alle Getränke in diesem Intervall: "+alcohol);
+
                         // If drinking time (min) > interval (min) distribute alcohol evenly
-                        if (records[key].drink.duration > interval / 60) {
+                        if (records[key].drink.duration > interval/60/1000) {
 
                             // Calculate parts
-                            parts_count = Math.ceil(records[key].drink.duration/(interval/60));
+                            parts_count = Math.ceil(records[key].drink.duration/(interval/60/1000));
 
                             // Calculate size of each part
                             parts_size = alcohol/parts_count;
 
                             // Distribute parts to later intervals
                             for (var j = 0; j <= parts_count; j++) {
-                                next_interval_timestamp = j * interval * 1000 + current_interval_timestamp;
+                                next_interval_timestamp = j * interval + current_interval_timestamp;
 
-                                next_interval = pad(new Date(next_interval_timestamp).getHours())+":"+
+                                next_interval_label = pad(new Date(next_interval_timestamp).getHours())+":"+
                                                 pad(new Date(next_interval_timestamp).getMinutes());
 
-                                if (!isNaN(alc_stack[next_interval])) {
-                                    alc_stack[next_interval] = alc_stack[next_interval] + parts_size;
+                                if (isNaN(alc_data[next_interval_label])) {
+                                    alc_data[next_interval_label] = parts_size;
                                 } else {
-                                    alc_stack[next_interval] = parts_size;
+                                    alc_data[next_interval_label] += parts_size;
                                 }
                             }
-                            // Assign first part for further calculation
-                            // TODO Was passiert mit dem Rest aus dem Alkohol-Stack???
+                            // Assign first part OR complete alcohol mass for further calculation
                             alcohol = parts_size;
+                        } else {
+
+                            // ...just add alcohol mass to current interval
+                            if (isNaN(alc_data[current_interval_label])) {
+                                alc_data[current_interval_label] = alcohol;
+                            } else {
+                                alc_data[current_interval_label] += alcohol;
+                            }
                         }
                     }
                 }
+
+                //$log.log("alc_data:");
+                //$log.log(alc_data);
 
                 //
                 // 2) Calculate blood alcohol concentration (BAC)
                 //
 
-                // Watson
+                // BAC calculation according to Watson
                 if (alcohol > 0) {
-                    if ($scope.bac > 0) {
-                        $scope.bac = $scope.bac + ((0.8 * alcohol)/(1.055 * total_body_water)) * 0.8;
+                    if (bac_data[current_interval_label] > 0) {
+                        $log.log("Alter Wert: "+bac_data[current_interval_label]);
+                        bac_data[current_interval_label] += ((0.8 * alcohol)/(1.055 * total_body_water)) * 0.8;
+                        $log.log("Neuer Wert: "+bac_data[current_interval_label]);
                     } else {
-                        $scope.bac = ((0.8 * alcohol)/(1.055 * total_body_water)) * 0.8;
+                        bac_data[current_interval_label] = ((0.8 * alcohol)/(1.055 * total_body_water)) * 0.8;
                     }
                 }
 
                 /*
-                 * Resorptionszeiten
+                 * Resorption times
                  * Schnaps (um 40 Vol%) ca. 10 %
                  * Wein/Sekt (um 10 Vol%) ca. 20 %
                  * Bier (um 5 Vol%) ca. 30 %
                  */
 
-                // Alcohol depletion
-                // 0,15 g/kg = 0,15 permille per hour
-                decrement = 0.15/(3600/interval*1000);
-                new_bac = $scope.bac - decrement;
+                //
+                // 3) Subtract BAC depletion and fill bac_data with times (21:40) and permilles (0.14)
+                //
+
+                /*
+                new_bac = bac_data[current_interval_label] - bac_depletion;
+
+                $log.log("Berechne bac_data[current_interval_label] - bac_depletion: "
+                        +bac_data[current_interval_label]+" permil - "+bac_depletion+" = "+new_bac+" permil ");
+
 
                 if (new_bac < 0) {
-                    $scope.bac = 0;
+                    bac_data[current_interval_label] = 0;
+                    $log.log("Neuer Promille-Wert unter Null");
                 } else {
-                    $scope.bac = new_bac;
+                    bac_data[current_interval_label] = new_bac;
                 }
+                 */
 
-                // Save data pairs (time_label, bac) in array
-                $scope.bac_data[time_label] = $scope.bac;
-
-                // Update maximum BAC, if necessary
-                if ($scope.bac > $scope.max_bac) {
-                    $scope.max_bac = $scope.bac;
-                }
-
-                // Increment counter with interval (milliseconds)
-                current_interval_timestamp = current_interval_timestamp + interval * 1000;
+                // Iterate to next interval
+                current_interval_timestamp = current_interval_timestamp + interval;
             }
+
+            // (Pre-)Calculate BAC data for all intervals that have alcohol
+            for (key in alc_data) {
+                // Last BAC value + BAC value calculated for this interval
+                bac_data[key] = last_bac +
+                        ((0.8 * alc_data[key]) / (1.055 * total_body_water)) * 0.8;
+
+                /*
+                $log.log("Intervall: " + key + " | Last BAC: "+last_bac+
+                        " | Berechne Promille für Alkoholmasse von "+ alc_data[key] +" g | Berechnete BAC:" + bac_data[key]);
+                */
+                last_bac = bac_data[key];
+            }
+
+            // Deplete alcohol in bac_data until "sober" (bac_data[lastElement] == 0)
+            // TODO Try to resolve redundancy with code above
+
+            // Begin from first interval
+            current_interval_timestamp = records[0].time;
+
+            var last_interval_label = "";
+
+            // As long as there is alcohol to deplete...
+            while (last_bac > 0) {
+
+                // Format time for current interval (e.g. "15:30")
+                current_interval_label = pad(new Date(current_interval_timestamp).getHours())+":"+
+                        pad(new Date(current_interval_timestamp).getMinutes());
+
+                last_interval_label = pad(new Date(current_interval_timestamp - interval).getHours())+":"+
+                        pad(new Date(current_interval_timestamp - interval).getMinutes());
+
+                // Set flag to remember current BAC value if there is one
+                VALID_BAC_EXISTS = !isNaN(bac_data[current_interval_label]);
+
+                // If BAC value is valid (positive)...
+                if (last_bac - bac_depletion > 0) {
+
+                    // Subtract bac_depletion from the element
+                    bac_data[current_interval_label] = last_bac - bac_depletion;
+
+                    // Iterate to next interval
+                    current_interval_timestamp = current_interval_timestamp + interval;
+
+                } else {
+                    // End while loop, stop writing values into BAC-array
+                    bac_data[current_interval_label] = 0;
+                    last_bac = 0;
+                }
+
+                // Save current BAC value
+                if (VALID_BAC_EXISTS) {
+                    last_bac = bac_data[current_interval_label];
+                } else {
+                    last_bac = bac_data[last_interval_label];
+                }
+            }
+
+            $log.log("bac_data:");
+            $log.log(bac_data);
+
+            return bac_data;
         }
 
         function pad(value) {
@@ -279,31 +366,6 @@
 <script src="js/bootstrap.min.js"></script>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!--
-<p>History</p>
-<div ng-controller="HistoryCtrl">
-    <ul>
-        <li ng-repeat="drink in drinks">
-            {{drink.name}}
-        </li>
-    </ul>
-</div>
--->
-
 <!-- Matchmaking -->
 <!--
 <a class="block" href="#"><i class="fa fa-users fa-2x"></i><br /> 15 Trinker online</a>
@@ -319,23 +381,6 @@
         <td><a href class="btn btn-default btn-sm" ng-click="history.addDrink(drink);">Hinzufügen</a></td>
     </tr>
 </table>
--->
-<!-- Add new drink -->
-<!--
-<a class="block" href="#"><i class="fa fa-plus-circle fa-2x"></i><br />Neues Getränk</a>
--->
-<!--
-<div class="history">
-    <div ng-controller="HistoryCtrl">
-        <div ng-hide="history.getItems().length" class="alert alert-info">Noch nichts getrunken.</div>
-        <table ng-show="history.getItems().length" class="table">
-            <tr ng-repeat="item in history.getItems() track by $index">
-                <td>{{item.name}}</td>
-                <td>{{item.price }}</td>
-            </tr>
-        </table>
-    </div>
-</div>
 -->
 
 <!--

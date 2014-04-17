@@ -1,21 +1,31 @@
 body {
-    background-color: #222;
+    background-color: #E70F0F;;
     font-family: 'Roboto', sans-serif;
     font-weight: 600;
     padding-top: 50px;
-    background-image: url("../img/tweed_@2x.png");
+    background-image: url(../img/tweed_2X.png);
+}
+.buttons {
+    color: #fff;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
 }
 .alluc-button {
     width: 150px;
     height: 150px;
     border: 2px solid #fff;
-    font-size: 1.2em;
+    font-size: 1.5em;
     font-weight: 400;
-    display: block;
+    display: inline-block;
     -webkit-border-radius: 75px;
     -moz-border-radius: 75px;
     border-radius: 75px;
-    padding-top: 30px;
+    text-align: center;
+    padding-top: 59px;
+    margin-right: 3%;
+    margin-left: 3%;
+    margin-bottom: 20px;
 }
 
 small {
@@ -39,7 +49,7 @@ small {
 
 .logo {
     font-weight: 300;
-    background-image: url("../img/logo.png");
+    background-image: url(../img/logo.png);
     background-repeat: no-repeat;
     background-size: contain;
     padding-left: 30px;
@@ -59,7 +69,7 @@ a:active {
 .stats {
     width: 100%;
     color: #fff;
-    padding: 20px;
+    padding: 40px;
     display: block;
     text-align: center;
 }
