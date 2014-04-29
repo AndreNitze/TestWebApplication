@@ -215,5 +215,12 @@ pip-log.txt
 .mr.developer.cfg
 
 
-## Own
+#############
+## Andre
+#############
+
+# My dev stuff
 dev/
+
+# IntelliJ IDEA
+.idea
